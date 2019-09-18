@@ -36,6 +36,7 @@ if __name__ == "__main__":
     bcf_file = sys.argv[1]
     bibfiles = sys.argv[2:]
     keys = get_keys(bcf_file)
+    print(f"% This file is managed by {sys.argv[0]} and should not be edited!")
     for bibfile in bibfiles:
         for item in get_items_from_bib(keys, 'cryptobib/crypto.bib'):
             print(item)
