@@ -13,6 +13,7 @@ Not anymore! This script will take your biblatex `bcf` file and then extract the
 .PHONY: main.pdf
 main.pdf: extracted_cryptobib.bib
 	./latexrun --bibtex-cmd=biber -Wall main.tex
+	# or latexmk, or just pdflatex a bunch of times...
 
 latex.out/main.bcf:
 	mkdir -p latex.out
