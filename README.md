@@ -22,3 +22,4 @@ extracted_cryptobib.bib: latex.out/main.bcf cryptobib/crypto.bib
 	python3 extract_from_bibliography.py $^ > $@
 ```
 
+[cryptobib]: https://cryptobib.di.ens.fr
