@@ -18,17 +18,20 @@ def get_items_from_bib(keys, filename):
         contents = f.read()
     regex = re.compile(
         r"""
-        ^@ \w+ \{ (%s),$\n          # KEY
+        ^@ \w+ \{ (?P<key>%s),$\n          # KEY
           .*?                    # BODY
         ^\}$""" % '|'.join(keys),
         re.MULTILINE | re.VERBOSE | re.DOTALL)
     for match in regex.finditer(contents):
-        string = match.group(0)
-        logging.info("Found %s", string.split('\n')[0])
-        yield string
+        key = match.group("key")
+        item = match.group(0)
+        logging.info("Found %s", item.split('\n')[0])
+        yield key, item
 
 
 if __name__ == "__main__":
+    logging.basicConfig()
+
     import sys
     if len(sys.argv) < 3:
         print(f"Usage: {sys.argv[0]} <bcf-file> <bibfile...>")
@@ -36,8 +39,13 @@ if __name__ == "__main__":
     bcf_file = sys.argv[1]
     bibfiles = sys.argv[2:]
     keys = get_keys(bcf_file)
+    found_keys = set()
     print(f"% This file is managed by {sys.argv[0]} and should not be edited!")
     for bibfile in bibfiles:
-        for item in get_items_from_bib(keys, bibfile):
-            print(item)
-            print()
+        for key, item in get_items_from_bib(keys, bibfile):
+            if key not in found_keys:
+                print(item)
+                print()
+                found_keys.add(key)
+            else:
+                logging.warning("Already printed %s before, second definition found in %s", key, bibfile)
