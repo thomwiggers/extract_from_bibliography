@@ -20,7 +20,7 @@ def get_items_from_bib(keys, filename):
         r"""
         ^@ \w+ \{ (?P<key>%s),$\n          # KEY
           .*?                    # BODY
-        ^\}$""" % '|'.join(keys),
+        ^\}$""" % '|'.join(map(re.escape, keys)),
         re.MULTILINE | re.VERBOSE | re.DOTALL)
     for match in regex.finditer(contents):
         key = match.group("key")
