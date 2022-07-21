@@ -56,5 +56,6 @@ if __name__ == "__main__":
         print()
         for second_item in item["also_found"]:
             print(f"% Also found in {second_item['file']}")
-            print(f"{item['content'].strip('@')}")
+            for line in second_item["content"].splitlines():
+                print(f"% {line}")
             print()
