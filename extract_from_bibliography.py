@@ -39,13 +39,22 @@ if __name__ == "__main__":
     bcf_file = sys.argv[1]
     bibfiles = sys.argv[2:]
     keys = get_keys(bcf_file)
-    found_keys = set()
+    found_items = dict()
     print(f"% This file is managed by {sys.argv[0]} and should not be edited!")
+
     for bibfile in bibfiles:
         for key, item in get_items_from_bib(keys, bibfile):
-            if key not in found_keys:
-                print(item)
-                print()
-                found_keys.add(key)
+            if key not in found_items:
+                found_items[key] = {"content": item, "file": bibfile, "also_found": []}
             else:
                 logging.warning("Already printed %s before, second definition found in %s", key, bibfile)
+                found_items[key]["also_found"].append({"file": bibfile, "content": item})
+
+    for key, item in found_items.items():
+        print(f"% Found in {item['file']}")
+        print(item["content"])
+        print()
+        for second_item in item["also_found"]:
+            print(f"% Also found in {second_item['file']}")
+            print(f"{item['content'].strip('@')}")
+            print()
