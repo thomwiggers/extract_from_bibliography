@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import re
 import logging
+from typing import Set
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 
 NAMESPACES = {'bcf': "https://sourceforge.net/projects/biblatex"}
 
 
-def get_keys(filename):
+def get_keys(filename) -> Set:
     parser = ET.parse(filename)
     root = parser.getroot()
     return {item.text for item in root.findall('.//bcf:citekey', NAMESPACES)}
@@ -51,6 +52,7 @@ if __name__ == "__main__":
                 found_items[key]["also_found"].append({"file": bibfile, "content": item})
 
     for key, item in sorted(found_items.items()):
+        keys.delete(key)
         print(f"% Found in {item['file']}")
         print(item["content"])
         print()
@@ -59,3 +61,6 @@ if __name__ == "__main__":
             for line in second_item["content"].splitlines():
                 print(f"% {line}")
             print()
+
+    for key in keys:
+        logging.warning("Haven't found %s in .bib sources", key)
