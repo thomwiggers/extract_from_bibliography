@@ -2,7 +2,7 @@
 import re
 import logging
 import xml.etree.ElementTree as ET
-
+from collections import OrderedDict
 
 NAMESPACES = {'bcf': "https://sourceforge.net/projects/biblatex"}
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     bcf_file = sys.argv[1]
     bibfiles = sys.argv[2:]
     keys = get_keys(bcf_file)
-    found_items = dict()
+    found_items = OrderedDict()
     print(f"% This file is managed by {sys.argv[0]} and should not be edited!")
 
     for bibfile in bibfiles:
@@ -50,7 +50,7 @@ if __name__ == "__main__":
                 logging.warning("Already printed %s before, second definition found in %s", key, bibfile)
                 found_items[key]["also_found"].append({"file": bibfile, "content": item})
 
-    for key, item in found_items.items():
+    for key, item in sorted(found_items.items()):
         print(f"% Found in {item['file']}")
         print(item["content"])
         print()
