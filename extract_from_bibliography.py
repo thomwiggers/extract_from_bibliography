@@ -52,7 +52,7 @@ if __name__ == "__main__":
                 found_items[key]["also_found"].append({"file": bibfile, "content": item})
 
     for key, item in sorted(found_items.items()):
-        keys.delete(key)
+        keys.remove(key)
         print(f"% Found in {item['file']}")
         print(item["content"])
         print()
