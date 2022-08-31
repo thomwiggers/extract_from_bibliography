@@ -29,6 +29,17 @@ def get_items_from_bib(keys, filename):
         logging.info("Found %s", item.split('\n')[0])
         yield key, item
 
+def cleanup_item(item):
+    if 'date' not in item:
+        return item
+    cleaned = []
+    for line in item.split('\n'):
+        if line.lstrip().startswith('month '):
+            line = line.replace("month =", "_month =")
+        elif line.lstrip().startswith('year '):
+            line = line.replace("year =", "_year =")
+        cleaned.append(line)
+    return '\n'.join(cleaned)
 
 if __name__ == "__main__":
     logging.basicConfig()
@@ -54,7 +65,7 @@ if __name__ == "__main__":
     for key, item in sorted(found_items.items()):
         keys.remove(key)
         print(f"% Found in {item['file']}")
-        print(item["content"])
+        print(cleanup_item(item["content"]))
         print()
         for second_item in item["also_found"]:
             print(f"% Also found in {second_item['file']}")
