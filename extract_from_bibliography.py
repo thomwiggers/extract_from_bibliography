@@ -21,12 +21,12 @@ def get_items_from_bib(keys, filename):
         r"""
         ^@ \w+ \{ (?P<key>%s),$\n          # KEY
           .*?                    # BODY
-        ^\}$""" % '|'.join(map(re.escape, keys)),
+        ^\s*\}$""" % '|'.join(map(re.escape, keys)),
         re.MULTILINE | re.VERBOSE | re.DOTALL)
     for match in regex.finditer(contents):
         key = match.group("key")
         item = match.group(0)
-        logging.info("Found %s", item.split('\n')[0])
+        logging.debug("Found %s", item.split('\n')[0])
         yield key, item
 
 def cleanup_item(item):
@@ -42,28 +42,27 @@ def cleanup_item(item):
     return '\n'.join(cleaned)
 
 if __name__ == "__main__":
-    logging.basicConfig()
+    logging.basicConfig(level=logging.WARNING)
 
     import sys
-    if len(sys.argv) < 3:
-        print(f"Usage: {sys.argv[0]} <bcf-file> <bibfile...>")
+    if len(sys.argv) < 4:
+        print(f"Usage: {sys.argv[0]} <bcf-file> <bibfile...> <output.bib>")
         sys.exit(1)
     bcf_file = sys.argv[1]
     bibfiles = sys.argv[2:]
     keys = get_keys(bcf_file)
     found_items = OrderedDict()
-    print(f"% This file is managed by {sys.argv[0]} and should not be edited!")
 
     for bibfile in bibfiles:
         for key, item in get_items_from_bib(keys, bibfile):
             if key not in found_items:
                 found_items[key] = {"content": item, "file": bibfile, "also_found": []}
             else:
-                logging.warning("Already printed %s before, second definition found in %s", key, bibfile)
+                logging.info("Already printed %s before, second definition found in %s", key, bibfile)
                 found_items[key]["also_found"].append({"file": bibfile, "content": item})
 
+    print(f"% This file is managed by {sys.argv[0]} and should not be edited!\n\n")
     for key, item in sorted(found_items.items()):
-        keys.remove(key)
         print(f"% Found in {item['file']}")
         print(cleanup_item(item["content"]))
         print()
@@ -73,5 +72,8 @@ if __name__ == "__main__":
                 print(f"% {line}")
             print()
 
-    for key in keys:
+    logging.debug("Found items: %s", sorted(found_items.keys()))
+    logging.debug("Requested items: %s", sorted(keys))
+
+    for key in (keys - set(found_items.keys())):
         logging.warning("Haven't found %s in .bib sources", key)
