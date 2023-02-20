@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 import re
 import logging
-from typing import Set
+from typing import Iterable, Set, Tuple, cast
+from pathlib import Path
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 
 NAMESPACES = {'bcf': "https://sourceforge.net/projects/biblatex"}
 
 
-def get_keys(filename) -> Set:
+def get_keys(filename: Path | str) -> Set[str]:
     parser = ET.parse(filename)
     root = parser.getroot()
-    return {item.text for item in root.findall('.//bcf:citekey', NAMESPACES)}
+    return {cast(str, item.text) for item in root.findall('.//bcf:citekey', NAMESPACES)}
 
 
-def get_items_from_bib(keys, filename):
+def get_items_from_bib(keys: Iterable[str], filename: Path | str) -> Iterable[Tuple[str, str]]:
     with open(filename, 'r') as f:
         contents = f.read()
     regex = re.compile(
@@ -25,11 +26,12 @@ def get_items_from_bib(keys, filename):
         re.MULTILINE | re.VERBOSE | re.DOTALL)
     for match in regex.finditer(contents):
         key = match.group("key")
+        assert isinstance(key, str)
         item = match.group(0)
         logging.debug("Found %s", item.split('\n')[0])
         yield key, item
 
-def cleanup_item(item):
+def cleanup_item(item: str):
     if 'date' not in item:
         return item
     cleaned = []
