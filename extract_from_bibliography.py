@@ -40,7 +40,7 @@ def cleanup_item(item: str):
             line = line.replace("month =", "_month =")
         elif line.lstrip().startswith('year '):
             line = line.replace("year =", "_year =")
-        cleaned.append(line)
+        cleaned.append(line.rstrip())
     return '\n'.join(cleaned)
 
 if __name__ == "__main__":
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         for second_item in item["also_found"]:
             print(f"% Also found in {second_item['file']}")
             for line in second_item["content"].splitlines():
-                print(f"% {line}")
+                print(f"% {line.rstrip()}")
             print()
 
     logging.debug("Found items: %s", sorted(found_items.keys()))
