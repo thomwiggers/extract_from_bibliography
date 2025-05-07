@@ -20,7 +20,7 @@ def get_items_from_bib(keys: Iterable[str], filename: Path | str) -> Iterable[Tu
         contents = f.read()
     regex = re.compile(
         r"""
-        ^@ \w+ \{ (?P<key>%s),$\n          # KEY
+        ^@ \w+ \{\s*(?P<key>%s)\s*,\s*$\n          # KEY
           .*?                    # BODY
         ^\s*\}$""" % '|'.join(map(re.escape, keys)),
         re.MULTILINE | re.VERBOSE | re.DOTALL)
