@@ -47,8 +47,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
 
     import sys
-    if len(sys.argv) < 4:
-        print(f"Usage: {sys.argv[0]} <bcf-file> <bibfile...> <output.bib>")
+    if len(sys.argv) < 3:
+        print(f"Usage: {sys.argv[0]} <bcf-file> <bibfile...> > <output.bib>")
         sys.exit(1)
     bcf_file = sys.argv[1]
     bibfiles = sys.argv[2:]
