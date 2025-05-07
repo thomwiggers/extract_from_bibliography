@@ -18,16 +18,18 @@ def get_keys(filename: Path | str) -> Set[str]:
 def get_items_from_bib(keys: Iterable[str], filename: Path | str) -> Iterable[Tuple[str, str]]:
     with open(filename, 'r') as f:
         contents = f.read()
+    # We do our best but, in the end, regexes are too weak too parse bibtex.
     regex = re.compile(
         r"""
-        ^@ \w+ \{\s*(?P<key>%s)\s*,\s*$\n          # KEY
-          .*?                    # BODY
-        ^\s*\}$""" % '|'.join(map(re.escape, keys)),
-        re.MULTILINE | re.VERBOSE | re.DOTALL)
+        (^|\n) \s* (?P<entry> @ \w+ \{ \s* (?P<key>%s) \s* ,  # KEY
+        .*?                                                   # BODY
+        \} ) (?= \s* @ \w+ \{ | $ )                           # END
+        """ % '|'.join(map(re.escape, keys)),
+        re.ASCII | re.VERBOSE | re.DOTALL)
     for match in regex.finditer(contents):
         key = match.group("key")
         assert isinstance(key, str)
-        item = match.group(0)
+        item = match.group("entry")
         logging.debug("Found %s", item.split('\n')[0])
         yield key, item
 
