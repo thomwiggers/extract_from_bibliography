@@ -32,8 +32,8 @@ def get_items_from_bib(keys: Iterable[str], filename: Path | str) -> Iterable[Tu
         yield key, item
 
 def cleanup_item(item: str):
-    regex = re.compile(r'^\s*date\s*=', re.MULTILINE)
-    if not regex.findall(item): 
+    regex = re.compile(r'^\s*date\s*=', re.MULTILINE | re.IGNORECASE)
+    if not regex.findall(item):
         return item
     cleaned = []
     for line in item.split('\n'):
